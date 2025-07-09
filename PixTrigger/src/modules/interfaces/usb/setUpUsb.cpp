@@ -44,7 +44,9 @@ std::string get_path(std::string command) {
     output += c;
   }
   pos = output.find('\n');
-  output.erase(pos);
+  if(pos != string::npos){
+     output.erase(pos);
+  }
   output.append(slash);
   pclose(fpipe);
   return output;
@@ -64,7 +66,9 @@ std::string create_folder(std::string folder_path) {
   std::time_t end_time = std::chrono::system_clock::to_time_t(end);
   datetime = static_cast<std::string>(ctime(&end_time));
   int pos = datetime.find('\n');
+  if(pos != string::npos){
   datetime.erase(pos);
+  }
   replace(datetime.begin(), datetime.end(), ':', '_');
   replace(datetime.begin(), datetime.end(), ' ', '_');
   cout << "Enter name of folder\n";

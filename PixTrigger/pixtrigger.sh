@@ -1,1 +1,1 @@
-./build/src/apps/pixtrigger serial:///dev/ttyACM0:921600
+./build/pixtrigger serial:///dev/ttyACM1:115200

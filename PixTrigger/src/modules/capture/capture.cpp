@@ -1,115 +1,44 @@
 /*
- * This code released into the public domain 21 July 2008
+ * capture.cpp - Versão Corrigida e Robusta
  *
- * This program does the equivalent of:
- * gphoto2 --shell
- *   > set-config capture=1
- *   > capture-image-and-download
- * compile with gcc -Wall -o canon-capture -lgphoto2 canon-capture.c
+ * ERRO CORRIGIDO: O código original usava a biblioteca libgphoto2, que não é
+ * compatível com a câmera nativa do Raspberry Pi (Raspicam).
  *
- * Taken from:
- * http://credentiality2.blogspot.com/2008/07/linux-libgphoto2-image-capture-from.html
- *
- * and condensed into simple capture sample
+ * SOLUÇÃO: Esta versão utiliza a ferramenta de linha de comando oficial
+ * `libcamera-still`, que é o método correto e mais confiável para
+ * capturar imagens no Raspberry Pi. A função agora recebe o caminho completo
+ * do arquivo a ser salvo, tornando-a mais modular.
  */
 
-
-#include "defines.h"
-#include <fcntl.h>
-#include <gphoto2/gphoto2.h>
-#include <iostream>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <string>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <time.h>
-static void errordumper(GPLogLevel level, const char *domain, const char *str,
-                        void *data) {
-  fprintf(stdout, "%s\n", str);
-}
+#include <cstdlib> // Para a função system()
+#include <iostream>
 
-static void capture_to_file(Camera *camera, GPContext *context, char *fn) {
-  int fd, retval;
-  CameraFile *file;
-  CameraFilePath camera_file_path;
+// Inclua o seu header correspondente, se necessário
+#include "capture.h"
 
-  printf("Capturing.\n");
+// A função agora recebe o caminho completo do arquivo onde a imagem deve ser salva.
+std::string capture_image(const std::string& full_image_path) {
 
-  /* NOP: This gets overridden in the library to /capt0000.jpg */
-  strcpy(camera_file_path.folder, "/");
-  strcpy(camera_file_path.name, "foo.jpg");
+    // Constrói o comando para a ferramenta libcamera-still
+    // -o: define o arquivo de saída (output)
+    // -t 500: timeout de 500ms para o sensor focar e ajustar a exposição
+    // --width 1920 --height 1080: define a resolução (ajuste se necessário)
+    // -n: --nopreview, não exibe uma janela de pré-visualização gráfica
+    std::string command = "libcamera-still -n -t 500 --width 1920 --height 1080 -o " + full_image_path + " > /dev/null 2>&1";
 
-  retval =
-      gp_camera_capture(camera, GP_CAPTURE_IMAGE, &camera_file_path, context);
-  printf("  Retval: %d\n", retval);
+    //std::cout << "[C++] Executando comando de captura: " << command << std::endl;
 
-  printf("Pathname on the camera: %s/%s\n", camera_file_path.folder,
-         camera_file_path.name);
+    // Executa o comando no terminal do sistema
+    int result = system(command.c_str());
 
-  fd = open(fn, O_CREAT | O_WRONLY | O_BINARY, 0644);
-  retval = gp_file_new_from_fd(&file, fd);
-  printf("  Retval: %d\n", retval);
-  retval =
-      gp_camera_file_get(camera, camera_file_path.folder, camera_file_path.name,
-                         GP_FILE_TYPE_NORMAL, file, context);
-  printf("  Retval: %d\n", retval);
-
-  gp_file_free(file);
-
-  printf("Deleting.\n");
-  retval = gp_camera_file_delete(camera, camera_file_path.folder,
-                                 camera_file_path.name, context);
-  printf("  Retval: %d\n", retval);
-}
-
-std::string capture_image(std::string path, std::string imagename) {
-  Camera *camera;
-  int retval;
-  GPContext *context = sample_create_context();
-  FILE *f;
-  char *data;
-  unsigned long size;
-
-  //~ gp_log_add_func(GP_LOG_ERROR, errordumper, NULL);
-  gp_camera_new(&camera);
-
-  /* When I set GP_LOG_DEBUG instead of GP_LOG_ERROR above, I noticed that the
-   * init function seems to traverse the entire filesystem on the camera.  This
-   * is partly why it takes so long.
-   * (Marcus: the ptp2 driver does this by default currently.)
-   */
-  printf("Camera init.  Takes about 10 seconds.\n");
-  retval = gp_camera_init(camera, context);
-  if (retval != GP_OK) {
-    printf("  Retval of capture_to_file: %d\n", retval);
-    exit(1);
-  }
-
-  clock_t begin, end;
-  begin = clock();
-  //~ std::cout << path << std::endl;
-  std::string temp = path + "/" + imagename + ".jpg";
-  std::cout << temp;
-  char *fpath = new char[temp.length() + 1];
-  strcpy(fpath, temp.c_str());
-  //~ std::cout << "FINAL PATH IS: " << std::endl;
-  capture_to_file(camera, context, fpath);
-  // capture_to_memory(camera, context, (const char**)&data, &size);
-  end = clock();
-  double time = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("Time taken is %f\n", time);
-  /*f = fopen("foo2.jpg", "wb");
-  if (f) {
-          retval = fwrite (data, size, 1, f);
-          if (retval != (int)size) {
-                  printf("  fwrite size %ld, written %d\n", size, retval);
-          }
-          fclose(f);
-  } else
-          printf("  fopen foo2.jpg failed.\n"); */
-  gp_camera_exit(camera, context);
-  return temp;
+    // A função system() retorna 0 em caso de sucesso
+    if (result == 0) {
+        // Se a captura foi bem-sucedida, retorna o caminho do arquivo criado
+        return full_image_path;
+    } else {
+        // Se houve um erro, informa no console e retorna uma string vazia
+        std::cerr << "[C++ ERRO] Falha ao executar o comando libcamera-still. Código de retorno: " << result << std::endl;
+        return "";
+    }
 }
