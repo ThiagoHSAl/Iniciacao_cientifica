@@ -59,7 +59,7 @@ echo "[PASSO 3/3] Instalando bibliotecas Python (pymavlink) dentro do venv..."
 source venv/bin/activate
 
 # Instala o pymavlink (e suas dependências como pyserial)
-pip install pymavlink
+pip install pymavlink pyserial
 
 # Desativa o venv ao final da instalação
 deactivate
