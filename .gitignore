@@ -1,0 +1,19 @@
+# 1. Ignora TUDO por padrão.
+*
+
+# 2. "Des-ignora" (permite) os diretórios que queremos
+#    e todo o seu conteúdo recursivamente.
+!/gatilhoCamera/
+!/gatilhoCamera/**
+!/testes_halow/
+!/testes_halow/**
+
+# 3. "Des-ignora" o próprio arquivo .gitignore
+#    (para que ele possa ser enviado ao repositório).
+!/.gitignore
+
+# 4. (Opcional) Re-ignora lixo comum do Python,
+#    mesmo DENTRO dos diretórios permitidos.
+__pycache__/
+*.pyc
+*.pyo
