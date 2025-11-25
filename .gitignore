@@ -7,6 +7,8 @@
 !/gatilhoCamera/**
 !/testes_halow/
 !/testes_halow/**
+!/testes_socket/
+!/testes_socket/**
 !/install_libs.sh
 !/start.sh
 
