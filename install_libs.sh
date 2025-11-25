@@ -25,7 +25,7 @@ sudo apt update
 # libimage-exiftool-perl: fornece o comando 'exiftool' para geotagging
 # python3-gpiozero: biblioteca moderna para controlar os LEDs
 # libcamera-apps: fornece o comando 'libcamera-still' (geralmente já instalado)
-sudo apt install -y git python3-pip python3-venv libimage-exiftool-perl python3-gpiozero libcamera-apps
+sudo apt install -y git python3-pip python3-venv libimage-exiftool-perl python3-gpiozero libcamera-apps watchdog paramiko
 
 echo "Dependências do sistema instaladas com sucesso."
 echo "------------------------------------------------------------------"

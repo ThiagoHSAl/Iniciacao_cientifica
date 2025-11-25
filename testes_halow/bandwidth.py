@@ -189,12 +189,6 @@ if __name__ == "__main__":
         print(f"Distância Base-Drone:  {distancia:.2f} metros")
         print(f"Largura de Banda (UL): {largura_banda:.2f} Mbits/sec")
         print("-" * 50)
-        
-        if distancia > 0:
-            ratio = largura_banda / distancia
-            print(f"Relação (Largura/Distância): {ratio:.3f} Mbits/s por metro")
-        else:
-            print("Distância é zero, não é possível calcular a relação.")
 
     except Exception as e:
         print(f"\n--- ERRO ---")
