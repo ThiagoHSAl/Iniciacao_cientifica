@@ -9,6 +9,10 @@
 !/testes_halow/**
 !/testes_socket/
 !/testes_socket/**
+!/estimate_position/
+!/estimate_position/**
+!/gps_getter/
+!/gps_getter/**
 !/install_libs.sh
 !/start.sh
 
